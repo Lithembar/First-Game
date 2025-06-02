@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url('https://images.unsplash.com/photo-1531685250784-7569952593d2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            overflow: hidden;
+        }
+        
+        .intro-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            transition: opacity 0.5s;
+        }
+        
+        .intro-title {
+            font-size: 5em;
+            margin-bottom: 30px;
+            text-align: center;
+            background: linear-gradient(90deg, #ff00ff, #00ffff, #ffff00, #ff00ff);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: neonGlow 5s linear infinite;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        
+        @keyframes neonGlow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 400% 50%; }
+        }
+        
+        .start-btn {
+            padding: 15px 40px;
+            font-size: 1.5em;
+            background: linear-gradient(45deg, #4CAF50, #2E7D32);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+        }
+        
+        .start-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 25px rgba(76, 175, 80, 0.8);
+        }
+        
+        .game-container {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+        }
+        
+        h1 {
+            color: #fff;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+        
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px auto;
+            aspect-ratio: 1/1;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .cell {
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 2px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 5px;
+            aspect-ratio: 1/1;
+        }
+        
+        .cell:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+        
+        .status {
+            font-size: 24px;
+            margin: 20px 0;
+            font-weight: bold;
+            min-height: 30px;
+        }
+        
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+        
+        .color-picker {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+        
+        .color-option.selected {
+            border-color: white;
+            box-shadow: 0 0 10px white;
+        }
+        
+        .player-settings {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .player-setting {
+            text-align: center;
+            margin: 10px;
+        }
+        
+        .winning-cell {
+            background-color: rgba(255, 255, 0, 0.3);
+            box-shadow: 0 0 15px gold;
+        }
+        
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+        
+        .celebration.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .celebration-text {
+            font-size: 4em;
+            margin-bottom: 30px;
+            text-align: center;
+            background: linear-gradient(90deg, #ff00ff, #00ffff, #ffff00, #ff00ff);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: neonGlow 3s linear infinite;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
+        }
+        
+        .continue-btn {
+            padding: 15px 40px;
+            font-size: 1.2em;
+            background: linear-gradient(45deg, #2196F3, #0D47A1);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 15px rgba(33, 150, 243, 0.5);
+        }
+        
+        .continue-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 25px rgba(33, 150, 243, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="intro-screen" id="introScreen">
+        <div class="intro-title">Tic-Tac-Toe</div>
+        <button class="start-btn" id="startBtn">Start Game</button>
+    </div>
+    
+    <div class="celebration" id="celebration">
+        <div class="celebration-text" id="celebrationText">Congratulations!</div>
+        <button class="continue-btn" id="continueBtn">Play Again</button>
+    </div>
+    
+    <div class="game-container" id="gameContainer" style="display: none;">
+        <h1>Tic-Tac-Toe</h1>
+        
+        <div class="player-settings">
+            <div class="player-setting">
+                <h3>Player X Color</h3>
+                <div class="color-picker" id="x-color-picker">
+                    <div class="color-option selected" style="background-color: #f44336;" data-color="#f44336"></div>
+                    <div class="color-option" style="background-color: #9C27B0;" data-color="#9C27B0"></div>
+                    <div class="color-option" style="background-color: #3F51B5;" data-color="#3F51B5"></div>
+                    <div class="color-option" style="background-color: #009688;" data-color="#009688"></div>
+                </div>
+            </div>
+            
+            <div class="player-setting">
+                <h3>Player O Color</h3>
+                <div class="color-picker" id="o-color-picker">
+                    <div class="color-option selected" style="background-color: #2196F3;" data-color="#2196F3"></div>
+                    <div class="color-option" style="background-color: #FF9800;" data-color="#FF9800"></div>
+                    <div class="color-option" style="background-color: #795548;" data-color="#795548"></div>
+                    <div class="color-option" style="background-color: #607D8B;" data-color="#607D8B"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="status">Player X's turn</div>
+        <div class="board" id="board">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+        </div>
+        <button id="reset">Reset Game</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const introScreen = document.getElementById('introScreen');
+            const startBtn = document.getElementById('startBtn');
+            const gameContainer = document.getElementById('gameContainer');
+            const board = document.getElementById('board');
+            const cells = document.querySelectorAll('.cell');
+            const status = document.querySelector('.status');
+            const resetButton = document.getElementById('reset');
+            const xColorPicker = document.getElementById('x-color-picker');
+            const oColorPicker = document.getElementById('o-color-picker');
+            const celebration = document.getElementById('celebration');
+            const celebrationText = document.getElementById('celebrationText');
+            const continueBtn = document.getElementById('continueBtn');
+            
+            let currentPlayer = 'X';
+            let gameState = ['', '', '', '', '', '', '', '', ''];
+            let gameActive = true;
+            let xColor = '#f44336';
+            let oColor = '#2196F3';
+            
+            const winningConditions = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
+                [0, 4, 8], [2, 4, 6]             // diagonals
+            ];
+            
+            // Start game from intro screen
+            startBtn.addEventListener('click', () => {
+                introScreen.style.opacity = '0';
+                setTimeout(() => {
+                    introScreen.style.display = 'none';
+                    gameContainer.style.display = 'block';
+                }, 500);
+            });
+            
+            // Continue after celebration
+            continueBtn.addEventListener('click', () => {
+                celebration.classList.remove('active');
+                resetGame();
+            });
+            
+            // Initialize color pickers
+            function initColorPickers() {
+                const xOptions = xColorPicker.querySelectorAll('.color-option');
+                const oOptions = oColorPicker.querySelectorAll('.color-option');
+                
+                xOptions.forEach(option => {
+                    option.addEventListener('click', () => {
+                        xOptions.forEach(opt => opt.classList.remove('selected'));
+                        option.classList.add('selected');
+                        xColor = option.getAttribute('data-color');
+                        updateCellColors();
+                    });
+                });
+                
+                oOptions.forEach(option => {
+                    option.addEventListener('click', () => {
+                        oOptions.forEach(opt => opt.classList.remove('selected'));
+                        option.classList.add('selected');
+                        oColor = option.getAttribute('data-color');
+                        updateCellColors();
+                    });
+                });
+            }
+            
+            // Update cell colors based on current selections
+            function updateCellColors() {
+                cells.forEach(cell => {
+                    if (cell.classList.contains('x')) {
+                        cell.style.color = xColor;
+                    } else if (cell.classList.contains('o')) {
+                        cell.style.color = oColor;
+                    }
+                });
+            }
+            
+            // Handle cell click
+            function handleCellClick(e) {
+                const clickedCell = e.target;
+                const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
+                
+                if (gameState[clickedCellIndex] !== '' || !gameActive) return;
+                
+                gameState[clickedCellIndex] = currentPlayer;
+                clickedCell.textContent = currentPlayer;
+                clickedCell.classList.add(currentPlayer.toLowerCase());
+                clickedCell.style.color = currentPlayer === 'X' ? xColor : oColor;
+                
+                checkResult();
+            }
+            
+            // Check game result
+            function checkResult() {
+                let roundWon = false;
+                let winningCombo = [];
+                
+                for (let i = 0; i < winningConditions.length; i++) {
+                    const [a, b, c] = winningConditions[i];
+                    if (gameState[a] === '' || gameState[b] === '' || gameState[c] === '') continue;
+                    
+                    if (gameState[a] === gameState[b] && gameState[b] === gameState[c]) {
+                        roundWon = true;
+                        winningCombo = winningConditions[i];
+                        break;
+                    }
+                }
+                
+                if (roundWon) {
+                    winningCombo.forEach(index => {
+                        cells[index].classList.add('winning-cell');
+                    });
+                    status.textContent = `Player ${currentPlayer} wins!`;
+                    gameActive = false;
+                    
+                    // Show celebration
+                    celebrationText.textContent = `Player ${currentPlayer} Wins!`;
+                    celebration.classList.add('active');
+                    return;
+                }
+                
+                if (!gameState.includes('')) {
+                    status.textContent = "Game ended in a draw!";
+                    gameActive = false;
+                    
+                    // Show celebration for draw
+                    celebrationText.textContent = "It's a Draw!";
+                    celebration.classList.add('active');
+                    return;
+                }
+                
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                status.textContent = `Player ${currentPlayer}'s turn`;
+            }
+            
+            // Reset game
+            function resetGame() {
+                currentPlayer = 'X';
+                gameState = ['', '', '', '', '', '', '', '', ''];
+                gameActive = true;
+                status.textContent = `Player ${currentPlayer}'s turn`;
+                
+                cells.forEach(cell => {
+                    cell.textContent = '';
+                    cell.classList.remove('x', 'o', 'winning-cell');
+                    cell.style.color = '';
+                });
+            }
+            
+            // Initialize the game
+            function initGame() {
+                initColorPickers();
+                
+                cells.forEach(cell => {
+                    cell.addEventListener('click', handleCellClick);
+                });
+                
+                resetButton.addEventListener('click', resetGame);
+            }
+            
+            initGame();
+        });
+    </script>
+</body>
+</html>
